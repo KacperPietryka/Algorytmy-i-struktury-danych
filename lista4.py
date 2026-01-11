@@ -7,26 +7,19 @@ class Node:
         self.value = _value
         self.next = _next
 
-class Stack(Node):
-    def __init__(self, _value = None, _next = None):
+class Stack():
+    def __init__(self, _value = None):
         self.head = None
         self.length = 0
-        if _value:
+        if _value is not None:
             self.push(_value)
-
-    def extend(self, node):
-        p = node
-        while p:
-            p = p.tail
-            self.length += 1
-        self.tail = node
 
     def __len__(self):
         return self.length
     
     def push(self, value):
         x = Node(value)
-        x.head = self.head
+        x.next = self.head
         self.head = x
         self.length += 1
     
@@ -34,11 +27,13 @@ class Stack(Node):
         if self.length == 0:
             raise IndexError('Can not pop an element')
         x = self.head.value
-        self.head = self.head.head
+        self.head = self.head.next
         self.length -= 1
         return x
     
     def top(self):
+        if self.length == 0:
+            return IndexError('List is empty')
         return self.head.value
     
     def __str__(self):
@@ -47,35 +42,40 @@ class Stack(Node):
         while p:
             values += str(p.value)
             values += ' '
-            p = p.head
+            p = p.next
         return values
 
-n = [(10000 // 10) * 10 * i for i in range(1, 11)]
-pop_t = [0 for _ in range(10)]
+n = [10_000 * i for i in range(1, 11)]
 push_t = [0 for _ in range(10)]
-top_t = [0 for _ in range(10)]
-rep = 10000
+top_t  = [0 for _ in range(10)]
+pop_t  = [0 for _ in range(10)]
 
-def measure(fun):
-    t0 = time.perf_counter()
-    fun()
-    t1 = time.perf_counter()
-    return t1 - t0
+for index in range(len(n)):
+    stack = Stack()
+    for _ in range(n[index]):
+        stack.push(1)
 
-for _ in range(rep):
-    for k in range(len(n)):
-        size = n[k]
-        stack = Stack()
-        for _ in range(k):
-            stack.push(1)
-        push_t[k] += measure(lambda: stack.push(1))
-        top_t[k] += measure(lambda: stack.top())
-        pop_t[k] += measure(lambda: stack.pop())
+    for i in range(1000):
+        t0 = time.perf_counter_ns()
+        stack.push(1)
+        t1 = time.perf_counter_ns()
+        push_t[index] += t1 - t0
+        
+        t2 = time.perf_counter_ns()
+        stack.pop()
+        t3 = time.perf_counter_ns()
+        pop_t[index] += t3 - t2
+
+        t4 = time.perf_counter_ns()
+        stack.top()
+        t5 = time.perf_counter_ns()
+        top_t[index] += t5 - t4
+
 
 for index in range(10):
-    push_t[index] /= rep
-    top_t[index] /= rep
-    pop_t[index] /= rep
+    push_t[index] /= 1000
+    top_t[index] /= 1000
+    pop_t[index] /= 1000
             
 
 plt.plot(n, push_t, 'o')
@@ -182,23 +182,28 @@ def ex2():
     t.set_left(0, '*')
     t.set_left(1,'+')
     t.set_right(1,'-')
+
     t.set_left(3, '5')
     t.set_right(3, '2')
+
     t.set_left(4,'2')
     t.set_right(4,'1')
 
-
-    t.set_right(0, '*')
+    t.set_right(0, '+')
     t.set_left(2, '+')
-    t.set_right(2, '8')
-    t.set_left(5,'+')
-    t.set_right(5,'-')
-    t.set_left(11,'2')
-    t.set_right(11, '9')
-    t.set_right(12, '1')
-    t.set_left(12, '-')
-    t.set_right(25, '2')
-    t.set_left(25, '7')
+    t.set_right(2, '*')
+
+    t.set_left(5, 2)
+    t.set_right(5, 9)
+
+    t.set_left(6, '-')
+    t.set_right(6, 8)
+
+    t.set_left(13, '-')
+    t.set_right(13, 1)
+    t.set_left(27, 7)
+    t.set_right(27, 2)
+
     t.draw('ex2')
 
 def ex3():
@@ -210,9 +215,10 @@ def ex3():
     u.set_right(1, 'U')
     u.set_left(3,'M')
     u.set_right(3,'F')
-    u.draw('ex2')
+    u.draw('ex3')
 
-ex3()
+ex2()
+#ex3()
 
 def derivative(bt, var):
 
@@ -287,6 +293,8 @@ bt.set_right(2, "x")
 
 d_bt = derivative(bt, "x")
 d_bt.draw()
+
+
 
 
 
