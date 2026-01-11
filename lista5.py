@@ -57,7 +57,7 @@ print('Zadanie 3')
 def zad_3():
     h_table = HashTable()
     for i in values:
-        h_table.insert_3(i, 7)
+        h_table.insert_3(i)
 zad_3()
 
 def rearrange(array, start, end):
@@ -109,5 +109,6 @@ for i in range(100):
     to_sort.append(random.randint(0, 200))
 
 print(sort(to_sort))
+
 
 
